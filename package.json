@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "initpy": "chmod +x convert/run.sh",
-    "toAscii": "./convert/run.sh"
+    "toAscii": "./convert/run.sh",
+    "play": "node play/play_ascii_video.js"
   },
   "keywords": [],
   "author": "",
