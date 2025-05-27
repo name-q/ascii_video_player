@@ -30,7 +30,7 @@ def frame_to_ascii(frame, width, height):
         ascii_frame += line + '\n'
     return ascii_frame
 
-def video_to_ascii(filepath, width=80, height=40, output='output/ascii_video.json'):
+def video_to_ascii(filepath, width=80, height=40, output='../output/ascii_video.json'):
     cap = cv2.VideoCapture(filepath)
     fps = cap.get(cv2.CAP_PROP_FPS)
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -59,4 +59,4 @@ def video_to_ascii(filepath, width=80, height=40, output='output/ascii_video.jso
     print(f"[DONE] Saved to {output}")
 
 if __name__ == '__main__':
-    video_to_ascii('assets/video.mp4', width=80, height=40)
+    video_to_ascii('../assets/video.mp4', width=80, height=40)
