@@ -59,4 +59,4 @@ def video_to_ascii(filepath, width=80, height=40, output='../output/ascii_video.
     print(f"[DONE] Saved to {output}")
 
 if __name__ == '__main__':
-    video_to_ascii('../assets/video.mp4', width=80, height=40)
+    video_to_ascii('../assets/video.mp4', width=60, height=30)
