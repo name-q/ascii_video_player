@@ -1,4 +1,10 @@
-import cv2
+try:
+    import cv2
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+    import cv2
 import json
 import os
 
