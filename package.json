@@ -2,13 +2,21 @@
   "name": "ascii_video_player",
   "version": "1.0.0",
   "main": "index.js",
+  "description": "A simple tool to convert MP4 videos into ASCII art animations and play them in the terminal.",
   "scripts": {
     "initpy": "chmod +x convert/run.sh",
     "toAscii": "./convert/run.sh",
     "play": "node play/play_ascii_video.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "description": ""
+  "keywords": [
+    "ascii",
+    "video",
+    "terminal",
+    "mp4",
+    "player",
+    "python",
+    "node"
+  ],
+  "author": "name-q<qyking@gmail.com>",
+  "license": "MIT"
 }
