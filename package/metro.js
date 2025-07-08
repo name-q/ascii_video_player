@@ -1,44 +1,30 @@
 const AsciiPlayer = require('./player');
 
-function createMetroPlugin(videoPath = 'output/ascii_video.json') {
-  let player = null;
+let globalPlayer = null;
 
-  return {
-    name: 'ascii-build-player',
+function withAsciiPlayer(config, videoPath = './ascii_video.json') {
+  // Start player immediately
+  if (!globalPlayer) {
+    globalPlayer = new AsciiPlayer(videoPath);
+    globalPlayer.start();
     
-    setup(build) {
-      // Metro build start
-      build.onStart(() => {
-        player = new AsciiPlayer(videoPath);
-        player.start();
-      });
-
-      // Metro build end
-      build.onEnd((result) => {
-        if (result.errors.length > 0) {
-          player?.showError(result.errors.join('\n'));
-        } else {
-          player?.showSuccess();
-        }
-      });
-    }
-  };
-}
-
-// For Metro config
-function withAsciiPlayer(config, videoPath) {
-  const originalTransformer = config.transformer || {};
+    // Listen for process exit to show success
+    process.on('SIGINT', () => {
+      globalPlayer?.showSuccess();
+      process.exit(0);
+    });
+    
+    // Listen for uncaught errors
+    process.on('uncaughtException', (error) => {
+      globalPlayer?.showError(error.stack || error.message);
+      process.exit(1);
+    });
+  }
   
   return {
     ...config,
-    transformer: {
-      ...originalTransformer,
-      plugins: [
-        ...(originalTransformer.plugins || []),
-        createMetroPlugin(videoPath)
-      ]
-    }
+    // Metro config remains unchanged
   };
 }
 
-module.exports = { createMetroPlugin, withAsciiPlayer };
+module.exports = { withAsciiPlayer };

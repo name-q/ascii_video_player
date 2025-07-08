@@ -1,6 +1,6 @@
 const AsciiPlayer = require('./player');
 
-function asciiPlayerPlugin(videoPath = 'output/ascii_video.json') {
+function asciiPlayerPlugin(videoPath = './ascii_video.json') {
   let player = null;
 
   return {

@@ -29,7 +29,36 @@ npm run initpy  # 仅首次运行
 npm run toAscii # 转换视频为ASCII
 ```
 
-3. 将生成的 `output/ascii_video.json` 复制到你的项目中
+3. 将生成的 `output/ascii_video.json` 复制到你的项目根目录
+
+## ⚠️ 重要：排除ASCII文件打包
+
+为防止大型ASCII视频文件被打包：
+
+**Rollup:**
+```js
+// rollup.config.js
+export default {
+  external: ['./ascii_video.json'] // 从根目录排除
+};
+```
+
+**Metro (React Native):**
+```js
+// metro.config.js
+const path = require('path');
+
+module.exports = {
+  resolver: {
+    alias: {
+      // 保持ASCII视频文件外部化
+      './ascii_video.json': path.resolve(__dirname, 'ascii_video.json'),
+    },
+  },
+};
+```
+
+**或者将ASCII文件放在public文件夹中并使用绝对路径**
 
 ## 🚀 使用方法
 
@@ -41,7 +70,7 @@ import asciiPlayerPlugin from 'ascii-build-player/rollup';
 
 export default {
   plugins: [
-    asciiPlayerPlugin('path/to/ascii_video.json')
+    asciiPlayerPlugin('./ascii_video.json') // 从项目根目录
   ]
 };
 ```
@@ -54,7 +83,7 @@ const { withAsciiPlayer } = require('ascii-build-player/metro');
 
 module.exports = withAsciiPlayer({
   // 你的Metro配置
-}, 'path/to/ascii_video.json');
+}, './ascii_video.json'); // 从项目根目录
 ```
 
 ### 直接使用播放器
@@ -62,7 +91,7 @@ module.exports = withAsciiPlayer({
 ```js
 const { AsciiPlayer } = require('ascii-build-player');
 
-const player = new AsciiPlayer('ascii_video.json');
+const player = new AsciiPlayer('./ascii_video.json'); // 从项目根目录
 player.start();
 
 // 构建成功时

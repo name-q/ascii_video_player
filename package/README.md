@@ -29,7 +29,36 @@ npm run initpy  # First time only
 npm run toAscii # Convert video to ASCII
 ```
 
-3. Copy the generated `output/ascii_video.json` to your project
+3. Copy the generated `output/ascii_video.json` to your project root directory
+
+## ⚠️ Important: Exclude ASCII Files from Bundle
+
+To prevent large ASCII video files from being bundled:
+
+**Rollup:**
+```js
+// rollup.config.js
+export default {
+  external: ['./ascii_video.json'] // Exclude from root directory
+};
+```
+
+**Metro (React Native):**
+```js
+// metro.config.js
+const path = require('path');
+
+module.exports = {
+  resolver: {
+    alias: {
+      // Keep ASCII video files external
+      './ascii_video.json': path.resolve(__dirname, 'ascii_video.json'),
+    },
+  },
+};
+```
+
+**Or place ASCII files in public folder and use absolute paths**
 
 ## 🚀 Usage
 
@@ -41,7 +70,7 @@ import asciiPlayerPlugin from 'ascii-build-player/rollup';
 
 export default {
   plugins: [
-    asciiPlayerPlugin('path/to/ascii_video.json')
+    asciiPlayerPlugin('./ascii_video.json') // From project root
   ]
 };
 ```
@@ -54,7 +83,7 @@ const { withAsciiPlayer } = require('ascii-build-player/metro');
 
 module.exports = withAsciiPlayer({
   // Your Metro config
-}, 'path/to/ascii_video.json');
+}, './ascii_video.json'); // From project root
 ```
 
 ### Direct Usage
@@ -62,7 +91,7 @@ module.exports = withAsciiPlayer({
 ```js
 const { AsciiPlayer } = require('ascii-build-player');
 
-const player = new AsciiPlayer('ascii_video.json');
+const player = new AsciiPlayer('./ascii_video.json'); // From project root
 player.start();
 
 // On build success
