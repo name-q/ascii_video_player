@@ -8,7 +8,7 @@ except ImportError:
 import json
 import os
 
-ascii_chars = "willliamQianMcdonalds@%#*+=-:. "
+ascii_chars = "nameq@%#*+·-:. "
 
 def rgb_to_ansi(r, g, b):
     return f"\033[38;2;{r};{g};{b}m"
