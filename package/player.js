@@ -10,7 +10,7 @@ class AsciiPlayer {
     this.playing = false;
     this.timer = null;
 
-    // this._hookConsoleForMetro(); // 自动侦测 Metro 输出
+    this._hookConsoleForMetro(); // 自动侦测 Metro 输出
   }
 
   start() {
@@ -54,32 +54,32 @@ class AsciiPlayer {
     console.error(error);
   }
 
-  // _hookConsoleForMetro() {
-  //   const originalLog = console.log;
-  //   const originalError = console.error;
+  _hookConsoleForMetro() {
+    const originalLog = console.log;
+    const originalError = console.error;
 
-  //   console.log = (...args) => {
-  //     try {
-  //       const msg = args.join(" ");
-  //       if (msg.includes("dev server on port") && !this.playing) {
-  //         this.start();
-  //       } else if (msg.includes("Done in")) {
-  //         this.showSuccess();
-  //       }
-  //     } catch (_) {}
-  //     originalLog(...args);
-  //   };
+    console.log = (...args) => {
+      const msg = args.join(" ");
 
-  //   console.error = (...args) => {
-  //     try {
-  //       const msg = args.join(" ");
-  //       if (msg.toLowerCase().includes("error")) {
-  //         this.showError(msg);
-  //       }
-  //     } catch (_) {}
-  //     originalError(...args);
-  //   };
-  // }
+      if (msg.includes("BUNDLE") && msg.includes("%") && !this.playing) {
+        // 启动动画
+        this.start();
+      } else if (msg.trim().startsWith("BUNDLE") && !msg.includes("%")) {
+        // 结束构建
+        this.showSuccess();
+      }
+
+      originalLog(...args);
+    };
+
+    console.error = (...args) => {
+      const msg = args.join(" ");
+      if (msg.toLowerCase().includes("error")) {
+        this.showError(msg);
+      }
+      originalError(...args);
+    };
+  }
 }
 
 module.exports = AsciiPlayer;
