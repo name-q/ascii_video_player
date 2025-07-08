@@ -5,6 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -51,7 +52,7 @@ jobs:
   publish:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release]')
     
     steps:
     - uses: actions/checkout@v3
@@ -76,9 +77,22 @@ jobs:
     - name: Copy ASCII video to package
       run: cp output/ascii_video.json package/
     
-    - name: Publish to NPM
+    - name: Check if version exists
+      id: check_version
       run: |
         cd package
+        VERSION=$(node -p "require('./package.json').version")
+        if npm view ascii-build-player@$VERSION version 2>/dev/null; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Publish to NPM
+      if: steps.check_version.outputs.exists == 'false'
+      run: |
+        cd package
+        echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > .npmrc
         npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
