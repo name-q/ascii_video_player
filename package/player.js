@@ -10,7 +10,7 @@ class AsciiPlayer {
     this.playing = false;
     this.timer = null;
 
-    this._hookConsoleForMetro(); // 自动侦测 Metro 输出
+    // this._hookConsoleForMetro(); // 自动侦测 Metro 输出
   }
 
   start() {
@@ -42,42 +42,44 @@ class AsciiPlayer {
   showSuccess() {
     this.stop();
     process.stdout.write(`\x1b[${this.height}A`);
+    console.clear();
     console.log("🎉 Build Success! 🎉");
   }
 
   showError(error) {
     this.stop();
     process.stdout.write(`\x1b[${this.height}A`);
+    console.clear();
     console.error("❌ Build Error:");
     console.error(error);
   }
 
-  _hookConsoleForMetro() {
-    const originalLog = console.log;
-    const originalError = console.error;
+  // _hookConsoleForMetro() {
+  //   const originalLog = console.log;
+  //   const originalError = console.error;
 
-    console.log = (...args) => {
-      try {
-        const msg = args.join(" ");
-        if (msg.includes("Bundling") && !this.playing) {
-          this.start();
-        } else if (msg.includes("Done in")) {
-          this.showSuccess();
-        }
-      } catch (_) {}
-      originalLog(...args);
-    };
+  //   console.log = (...args) => {
+  //     try {
+  //       const msg = args.join(" ");
+  //       if (msg.includes("dev server on port") && !this.playing) {
+  //         this.start();
+  //       } else if (msg.includes("Done in")) {
+  //         this.showSuccess();
+  //       }
+  //     } catch (_) {}
+  //     originalLog(...args);
+  //   };
 
-    console.error = (...args) => {
-      try {
-        const msg = args.join(" ");
-        if (msg.toLowerCase().includes("error")) {
-          this.showError(msg);
-        }
-      } catch (_) {}
-      originalError(...args);
-    };
-  }
+  //   console.error = (...args) => {
+  //     try {
+  //       const msg = args.join(" ");
+  //       if (msg.toLowerCase().includes("error")) {
+  //         this.showError(msg);
+  //       }
+  //     } catch (_) {}
+  //     originalError(...args);
+  //   };
+  // }
 }
 
 module.exports = AsciiPlayer;
