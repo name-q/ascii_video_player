@@ -1,0 +1,24 @@
+const AsciiPlayer = require('./player');
+
+function asciiPlayerPlugin(videoPath = 'output/ascii_video.json') {
+  let player = null;
+
+  return {
+    name: 'ascii-build-player',
+    
+    buildStart() {
+      player = new AsciiPlayer(videoPath);
+      player.start();
+    },
+
+    buildEnd(error) {
+      if (error) {
+        player?.showError(error.stack || error.message);
+      } else {
+        player?.showSuccess();
+      }
+    }
+  };
+}
+
+module.exports = asciiPlayerPlugin;

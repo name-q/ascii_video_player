@@ -1,0 +1,15 @@
+{
+  "name": "ascii-build-player",
+  "version": "1.0.0",
+  "description": "ASCII video player for build processes (Metro/Rollup)",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "metro.js",
+    "rollup.js",
+    "player.js"
+  ],
+  "keywords": ["ascii", "video", "metro", "rollup", "build", "animation"],
+  "author": "",
+  "license": "MIT"
+}
