@@ -1,6 +1,6 @@
 {
   "name": "ascii_video_player",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "description": "A simple tool to convert MP4 videos into ASCII art animations and play them in the terminal.",
   "scripts": {

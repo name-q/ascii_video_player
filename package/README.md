@@ -1,14 +1,37 @@
 # ASCII Build Player
 
-在构建过程中播放ASCII视频动画的npm包，支持Metro和Rollup。
+[中文](./README_zh.md) | English
 
-## 安装
+Play ASCII video animations during build processes. Supports Metro and Rollup.
+
+## 📦 Installation
 
 ```bash
 npm install ascii-build-player
 ```
 
-## 使用
+## 🎬 Generate ASCII Video
+
+First, you need to generate ASCII video files using our converter:
+
+👉 **[ASCII Video Generator](https://github.com/name-q/ascii_video_player)**
+
+1. Clone the repository:
+```bash
+git clone https://github.com/name-q/ascii_video_player.git
+cd ascii_video_player
+```
+
+2. Convert your video:
+```bash
+# Put your .mp4 file in assets/video.mp4
+npm run initpy  # First time only
+npm run toAscii # Convert video to ASCII
+```
+
+3. Copy the generated `output/ascii_video.json` to your project
+
+## 🚀 Usage
 
 ### Rollup
 
@@ -30,11 +53,11 @@ export default {
 const { withAsciiPlayer } = require('ascii-build-player/metro');
 
 module.exports = withAsciiPlayer({
-  // 你的Metro配置
+  // Your Metro config
 }, 'path/to/ascii_video.json');
 ```
 
-### 直接使用播放器
+### Direct Usage
 
 ```js
 const { AsciiPlayer } = require('ascii-build-player');
@@ -42,46 +65,46 @@ const { AsciiPlayer } = require('ascii-build-player');
 const player = new AsciiPlayer('ascii_video.json');
 player.start();
 
-// 构建成功时
+// On build success
 player.showSuccess();
 
-// 构建失败时
+// On build error
 player.showError(error);
 ```
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 package/
-├── index.js           # 主入口文件
-├── player.js          # 核心播放器类
-├── metro.js           # Metro插件
-├── rollup.js          # Rollup插件
-├── test.js            # 测试脚本
-├── example-rollup.js  # Rollup使用示例
-├── package.json       # NPM包配置
-└── README.md          # 使用文档
+├── index.js           # Main entry file
+├── player.js          # Core player class
+├── metro.js           # Metro plugin
+├── rollup.js          # Rollup plugin
+├── test.js            # Test script
+├── example-rollup.js  # Rollup usage example
+├── package.json       # NPM package configuration
+└── README.md          # Documentation
 ```
 
-## 🎯 核心功能
+## 🎯 Core Features
 
-- **循环播放**: 构建过程中持续播放ASCII动画
-- **智能停止**: 构建完成或出错时自动停止
-- **错误处理**: 显示完整错误堆栈信息
-- **成功提示**: 构建成功时显示庆祝动画
+- **Loop Playback**: Continuously plays ASCII animation during the build process
+- **Smart Stop**: Automatically stops when the build completes or encounters an error
+- **Error Handling**: Displays full error stack trace
+- **Success Notification**: Shows a celebratory animation upon successful build
 
-## 🧪 测试
+## 🧪 Testing
 
 ```bash
-# 运行测试
+# Run tests
 npm test
 
-# Rollup示例
+# Rollup example
 npm run example:rollup
 ```
 
 ## 🚀 CI/CD
 
-- GitHub Actions自动化测试
-- 多Node.js版本兼容性测试
-- 自动NPM发布流程
+- Automated testing via GitHub Actions
+- Compatibility testing across multiple Node.js versions
+- Automated publishing to NPM
