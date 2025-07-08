@@ -48,3 +48,40 @@ player.showSuccess();
 // 构建失败时
 player.showError(error);
 ```
+
+## 📁 项目结构
+
+```
+package/
+├── index.js           # 主入口文件
+├── player.js          # 核心播放器类
+├── metro.js           # Metro插件
+├── rollup.js          # Rollup插件
+├── test.js            # 测试脚本
+├── example-rollup.js  # Rollup使用示例
+├── package.json       # NPM包配置
+└── README.md          # 使用文档
+```
+
+## 🎯 核心功能
+
+- **循环播放**: 构建过程中持续播放ASCII动画
+- **智能停止**: 构建完成或出错时自动停止
+- **错误处理**: 显示完整错误堆栈信息
+- **成功提示**: 构建成功时显示庆祝动画
+
+## 🧪 测试
+
+```bash
+# 运行测试
+npm test
+
+# Rollup示例
+npm run example:rollup
+```
+
+## 🚀 CI/CD
+
+- GitHub Actions自动化测试
+- 多Node.js版本兼容性测试
+- 自动NPM发布流程
