@@ -26,6 +26,10 @@ async function playAsciiVideo(filepath) {
 
   process.stdout.write(`\x1b[${height}B`);
   console.log(stop ? "🏀😧" : "🏀😊🎉");
+  
+  // 恢复终端状态并退出
+  if (process.stdin.isTTY) process.stdin.setRawMode(false);
+  process.exit(0);
 }
 
 playAsciiVideo('output/ascii_video.json');
