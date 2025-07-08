@@ -9,6 +9,10 @@
     "rollup.js",
     "player.js"
   ],
+  "scripts": {
+    "test": "node test.js",
+    "example:rollup": "node example-rollup.js"
+  },
   "keywords": ["ascii", "video", "metro", "rollup", "build", "animation"],
   "author": "",
   "license": "MIT"

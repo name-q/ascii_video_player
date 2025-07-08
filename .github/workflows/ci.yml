@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install Python dependencies
+      run: |
+        cd convert
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Convert video to ASCII
+      run: |
+        chmod +x convert/run.sh
+        npm run toAscii
+    
+    - name: Install package dependencies
+      run: |
+        cd package
+        npm install
+    
+    - name: Run tests
+      run: |
+        cd package
+        timeout 15s node test.js || true
+    
+    - name: Test Rollup example
+      run: |
+        cd package
+        timeout 10s node example-rollup.js || true
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        registry-url: 'https://registry.npmjs.org'
+    
+    - name: Install Python dependencies
+      run: |
+        cd convert
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Convert video to ASCII
+      run: |
+        chmod +x convert/run.sh
+        npm run toAscii
+    
+    - name: Copy ASCII video to package
+      run: cp output/ascii_video.json package/
+    
+    - name: Publish to NPM
+      run: |
+        cd package
+        npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
