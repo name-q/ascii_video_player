@@ -57,20 +57,24 @@ class AsciiPlayer {
     const originalError = console.error;
 
     console.log = (...args) => {
-      const msg = args.join(" ");
-      if (msg.includes("Bundling") && !this.playing) {
-        this.start();
-      } else if (msg.includes("Done in")) {
-        this.showSuccess();
-      }
+      try {
+        const msg = args.join(" ");
+        if (msg.includes("Bundling") && !this.playing) {
+          this.start();
+        } else if (msg.includes("Done in")) {
+          this.showSuccess();
+        }
+      } catch (_) {}
       originalLog(...args);
     };
 
     console.error = (...args) => {
-      const msg = args.join(" ");
-      if (msg.toLowerCase().includes("error")) {
-        this.showError(msg);
-      }
+      try {
+        const msg = args.join(" ");
+        if (msg.toLowerCase().includes("error")) {
+          this.showError(msg);
+        }
+      } catch (_) {}
       originalError(...args);
     };
   }
