@@ -17,12 +17,14 @@ First, you need to generate ASCII video files using our converter:
 👉 **[ASCII Video Generator](https://github.com/name-q/ascii_video_player)**
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/name-q/ascii_video_player.git
 cd ascii_video_player
 ```
 
 2. Convert your video:
+
 ```bash
 # Put your .mp4 file in assets/video.mp4
 npm run initpy  # First time only
@@ -36,29 +38,60 @@ npm run toAscii # Convert video to ASCII
 To prevent large ASCII video files from being bundled:
 
 **Rollup:**
+
 ```js
 // rollup.config.js
 export default {
-  external: ['./ascii_video.json'] // Exclude from root directory
+  external: ["./ascii_video.json"], // Exclude from root directory
 };
 ```
 
 **Metro (React Native):**
+
 ```js
 // metro.config.js
-const path = require('path');
+const path = require("path");
 
 module.exports = {
   resolver: {
     alias: {
       // Keep ASCII video files external
-      './ascii_video.json': path.resolve(__dirname, 'ascii_video.json'),
+      "./ascii_video.json": path.resolve(__dirname, "ascii_video.json"),
     },
   },
 };
 ```
 
-**Or place ASCII files in public folder and use absolute paths**
+
+### 🛠 Important: Metro Configuration Must Be Async
+
+If your project uses async logic like `getMetroConfig()`, **Metro must export an async function**, not a Promise.
+
+🚫 Incorrect (passing a Promise to `withAsciiPlayer`):
+
+```js
+module.exports = withAsciiPlayer((async () => {
+  const baseConfig = await getMetroConfig();
+  const moreConfig = await getMoreConfig();
+  return  mergeConfig(baseConfig,moreConfig);
+})(), './ascii_video.json');
+```
+
+✅ Correct:
+
+```js
+module.exports = async () => {
+  const baseConfig = await getMetroConfig();
+  const moreConfig = await getMoreConfig();
+  const merged = mergeConfig(baseConfig,moreConfig)
+  return withAsciiPlayer(merged, './ascii_video.json');
+};
+```
+
+> Otherwise, Metro bundling may break with errors like:
+>
+> `❌ Could not get BatchedBridge, make sure your bundle is packaged correctly`
+
 
 ## 🚀 Usage
 
@@ -66,12 +99,12 @@ module.exports = {
 
 ```js
 // rollup.config.js
-import asciiPlayerPlugin from 'ascii-build-player/rollup';
+import asciiPlayerPlugin from "ascii-build-player/rollup";
 
 export default {
   plugins: [
-    asciiPlayerPlugin('./ascii_video.json') // From project root
-  ]
+    asciiPlayerPlugin("./ascii_video.json"), // From project root
+  ],
 };
 ```
 
@@ -79,19 +112,22 @@ export default {
 
 ```js
 // metro.config.js
-const { withAsciiPlayer } = require('ascii-build-player/metro');
+const { withAsciiPlayer } = require("ascii-build-player/metro");
 
-module.exports = withAsciiPlayer({
-  // Your Metro config
-}, './ascii_video.json'); // From project root
+module.exports = withAsciiPlayer(
+  {
+    // Your Metro config
+  },
+  "./ascii_video.json"
+); // From project root
 ```
 
 ### Direct Usage
 
 ```js
-const { AsciiPlayer } = require('ascii-build-player');
+const { AsciiPlayer } = require("ascii-build-player");
 
-const player = new AsciiPlayer('./ascii_video.json'); // From project root
+const player = new AsciiPlayer("./ascii_video.json"); // From project root
 player.start();
 
 // On build success

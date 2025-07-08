@@ -86,6 +86,36 @@ module.exports = withAsciiPlayer({
 }, './ascii_video.json'); // 从项目根目录
 ```
 
+### 🛠 Metro 配置中的注意事项（重要）
+
+如果你的项目使用了 `async` 异步逻辑（如 `getMetroConfig()`），**Metro 配置必须导出一个 async 函数**，而不能直接传入 Promise。
+
+🚫 错误写法（将 Promise 直接传给 `withAsciiPlayer`）：
+
+```js
+module.exports = withAsciiPlayer((async () => {
+  const baseConfig = await getMetroConfig();
+  const moreConfig = await getMoreConfig();
+  return  mergeConfig(baseConfig,moreConfig);
+})(), './ascii_video.json');
+```
+
+✅ 正确写法：
+
+```js
+module.exports = async () => {
+  const baseConfig = await getMetroConfig();
+  const moreConfig = await getMoreConfig();
+  const merged = mergeConfig(baseConfig,moreConfig)
+  return withAsciiPlayer(merged, './ascii_video.json');
+};
+```
+
+> 否则会导致 Metro 无法打包，报错：
+>
+> `❌ Could not get BatchedBridge, make sure your bundle is packaged correctly`
+
+
 ### 直接使用播放器
 
 ```js
