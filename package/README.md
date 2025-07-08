@@ -1,6 +1,6 @@
 # ASCII Build Player
 
-[中文](./README_zh.md) | English
+[中文](https://github.com/name-q/ascii_video_player/blob/main/package/README_zh.md) | English
 
 Play ASCII video animations during build processes. Supports Metro and Rollup.
 
