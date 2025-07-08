@@ -21,7 +21,6 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
     
     - name: Install Python dependencies
       run: |
@@ -37,7 +36,7 @@ jobs:
     - name: Install package dependencies
       run: |
         cd package
-        npm install
+        npm install --no-package-lock
     
     - name: Run tests
       run: |
