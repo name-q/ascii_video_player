@@ -1,6 +1,6 @@
 {
   "name": "ascii-build-player",
-  "version": "1.0.5-alpha2",
+  "version": "1.0.5-alpha3",
   "description": "ASCII video player for build processes (Metro/Rollup)",
   "main": "index.js",
   "files": [

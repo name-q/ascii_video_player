@@ -54,18 +54,24 @@ class AsciiPlayer {
     console.error(error);
   }
 
+  _stripAnsi(str) {
+    return str.replace(
+      /[][[\]()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+      ""
+    );
+  }
+
   _hookConsoleForMetro() {
     const originalLog = console.log;
     const originalError = console.error;
 
     console.log = (...args) => {
-      const msg = args.join(" ");
+      const rawMsg = args.join(" ");
+      const msg = this._stripAnsi(rawMsg);
 
       if (msg.includes("BUNDLE") && msg.includes("%") && !this.playing) {
-        // 启动动画
         this.start();
       } else if (msg.trim().startsWith("BUNDLE") && !msg.includes("%")) {
-        // 结束构建
         this.showSuccess();
       }
 
@@ -73,7 +79,7 @@ class AsciiPlayer {
     };
 
     console.error = (...args) => {
-      const msg = args.join(" ");
+      const msg = this._stripAnsi(args.join(" "));
       if (msg.toLowerCase().includes("error")) {
         this.showError(msg);
       }
