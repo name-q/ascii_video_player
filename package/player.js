@@ -10,6 +10,10 @@ class AsciiPlayer {
     this.playing = false;
     this.timer = null;
 
+    // 记录原有输出逻辑
+    this.originalStdoutWrite = process.stdout.write.bind(process.stdout);
+    this.originalStderrWrite = process.stderr.write.bind(process.stderr);
+
     // 是否进入拦截逻辑
     this.isHookActive = options.hookConsole;
     if (options.hookConsole) {
@@ -39,8 +43,8 @@ class AsciiPlayer {
     if (!this.playing) return;
 
     process.stdout.write(`\x1b[${this.height}A`);
-    // 加入零宽空格标记
-    console.log(this.frames[this.currentFrame] + "\u200B\u200B");
+    // console.log(this.frames[this.currentFrame] + "\u200B\u200B");
+    this.originalStdoutWrite(this.frames[this.currentFrame]);
 
     this.currentFrame = (this.currentFrame + 1) % this.frames.length;
 
@@ -49,17 +53,18 @@ class AsciiPlayer {
 
   showSuccess() {
     this.stop();
-    process.stdout.write(`\x1b[${this.height}A`);
+    this.originalStdoutWrite(`\x1b[${this.height}A`);
     console.clear();
-    console.log("🎉 Build Success! 🎉\u200B\u200B\n");
+    // console.log("🎉 Build Success! 🎉\u200B\u200B\n");
+    this.originalStdoutWrite("🎉 Build Success! 🎉\n");
   }
 
   showError(error) {
     this.stop();
-    process.stdout.write(`\x1b[${this.height}A`);
+    this.originalStdoutWrite(`\x1b[${this.height}A`);
     console.clear();
-    console.error("❌ Build Error:\n");
-    console.error(error);
+    this.originalStderrWrite("❌ Build Error:\n\n");
+    this.originalStderrWrite(error + "\n\n");
   }
 
   _stripAnsi(str) {
@@ -71,64 +76,53 @@ class AsciiPlayer {
 
   // 日志拦截方案
   _hookConsole(tool) {
-    const originalStdoutWrite = process.stdout.write.bind(process.stdout);
-    const originalStderrWrite = process.stderr.write.bind(process.stderr);
-
     // 抑制播放时原内容输出
-    this.suppressOutput = false;
+    // this.suppressOutput = false;
 
     process.stdout.write = (chunk, encoding, callback) => {
       if (!this.isHookActive) {
-        // 不在播放状态，直接透传，无性能损耗
-        return originalStdoutWrite(chunk, encoding, callback);
+        return this.originalStdoutWrite(chunk, encoding, callback);
       }
 
       const msg = chunk.toString();
       const strippedMsg = this._stripAnsi(msg);
 
       if (tool === "metro") {
-        if (strippedMsg.includes("Dev server ready") && !this.playing) {
-          this.suppressOutput = true;
+        if (!this.playing && strippedMsg.includes("Dev server ready")) {
+          // this.suppressOutput = true;
           this.start();
         } else if (
           strippedMsg.trim().startsWith("BUNDLE") &&
           !strippedMsg.includes("%")
         ) {
           this.showSuccess();
-          this.suppressOutput = false;
+          // this.suppressOutput = false;
         }
       }
 
       // 如果rollup、webpack、vite等工具也要走日志监听的路子，可以在这里扩展
       // 但目前rollup走生命周期钩子，，所以这里就不写了
 
-      if (msg.includes("\u200B\u200B") || !this.suppressOutput) {
-        originalStdoutWrite(
-          chunk.replace("\u200B\u200B", ""),
-          encoding,
-          callback
-        );
+      // 如果没有播放状态，直接输出原内容
+      if (!this.playing) {
+        return this.originalStdoutWrite(chunk, encoding, callback);
       }
     };
 
-    process.stderr.write = (chunk, encoding, callback) => {
-      if (!this.isHookActive) {
-        // 不在播放状态，直接透传，无性能损耗
-        return originalStderrWrite(chunk, encoding, callback);
-      }
+    // error的输出逻辑在外部process.on('uncaughtException', ...)中处理或生命周期监听了 这里也去掉吧
+    // process.stderr.write = (chunk, encoding, callback) => {
+    //   if (!this.suppressOutput) {
+    //     return originalStderrWrite(chunk, encoding, callback);
+    //   }
 
-      const msg = chunk.toString();
-      const strippedMsg = this._stripAnsi(msg);
+    //   const msg = this._stripAnsi(chunk.toString());
 
-      if (strippedMsg.toLowerCase().includes("error")) {
-        this.showError(strippedMsg);
-        this.suppressOutput = false;
-      }
+    //   if (msg.toLowerCase().includes("error")) {
+    //     this.showError(msg);
+    //   }
 
-      if (!this.suppressOutput) {
-        originalStderrWrite(chunk, encoding, callback);
-      }
-    };
+    //   // stderr 同理屏蔽
+    // };
   }
 }
 
