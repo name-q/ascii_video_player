@@ -10,18 +10,23 @@ class AsciiPlayer {
     this.playing = false;
     this.timer = null;
 
+    // 默认进入拦截逻辑
+    this.isHookActive = true;
+
     this._hookConsoleForMetro(); // 自动侦测 Metro 输出
   }
 
   start() {
     if (this.playing) return;
     this.playing = true;
+    this.isHookActive = true; // 开始播放时打开拦截逻辑
     console.clear();
     this.playLoop();
   }
 
   stop() {
     this.playing = false;
+    this.isHookActive = false; // 结束播放时关闭拦截逻辑
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null;
@@ -66,9 +71,15 @@ class AsciiPlayer {
     const originalStdoutWrite = process.stdout.write.bind(process.stdout);
     const originalStderrWrite = process.stderr.write.bind(process.stderr);
 
+    // 抑制播放时原内容输出
     this.suppressOutput = false;
 
     process.stdout.write = (chunk, encoding, callback) => {
+      if (!this.isHookActive) {
+        // 不在播放状态，直接透传，无性能损耗
+        return originalStdoutWrite(chunk, encoding, callback);
+      }
+
       const msg = chunk.toString();
       const strippedMsg = this._stripAnsi(msg);
 
@@ -83,13 +94,21 @@ class AsciiPlayer {
         this.suppressOutput = false;
       }
 
-      // 检测零宽空格标记
       if (msg.includes("\u200B\u200B") || !this.suppressOutput) {
-        originalStdoutWrite(chunk.replace("\u200B\u200B", ""), encoding, callback);
+        originalStdoutWrite(
+          chunk.replace("\u200B\u200B", ""),
+          encoding,
+          callback
+        );
       }
     };
 
     process.stderr.write = (chunk, encoding, callback) => {
+      if (!this.isHookActive) {
+        // 不在播放状态，直接透传，无性能损耗
+        return originalStderrWrite(chunk, encoding, callback);
+      }
+
       const msg = chunk.toString();
       const strippedMsg = this._stripAnsi(msg);
 
