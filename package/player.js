@@ -14,7 +14,7 @@ class AsciiPlayer {
     this.isHookActive = options.hookConsole;
     if (options.hookConsole) {
       // 原自动侦测 Metro 输出 改为公共方案 如果走日志监听在里面判断tool的逻辑
-      this._hookConsole();
+      this._hookConsole(options.tool);
     }
   }
 
@@ -70,7 +70,7 @@ class AsciiPlayer {
   }
 
   // 日志拦截方案
-  _hookConsole() {
+  _hookConsole(tool) {
     const originalStdoutWrite = process.stdout.write.bind(process.stdout);
     const originalStderrWrite = process.stderr.write.bind(process.stderr);
 
@@ -86,7 +86,7 @@ class AsciiPlayer {
       const msg = chunk.toString();
       const strippedMsg = this._stripAnsi(msg);
 
-      if (this.tool === "metro") {
+      if (tool === "metro") {
         if (strippedMsg.includes("Dev server ready") && !this.playing) {
           this.suppressOutput = true;
           this.start();
