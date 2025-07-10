@@ -7,7 +7,7 @@ function asciiPlayerPlugin(videoPath = './ascii_video.json') {
     name: 'ascii-build-player',
     
     buildStart() {
-      player = new AsciiPlayer(videoPath);
+      player = new AsciiPlayer(videoPath, { tool: 'rollup', hookConsole: false });
       player.start();
     },
 

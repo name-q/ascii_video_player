@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 class AsciiPlayer {
-  constructor(videoPath) {
+  constructor(videoPath, options = { tool: "metro", hookConsole: true }) {
     const data = JSON.parse(fs.readFileSync(videoPath, "utf-8"));
     this.frames = data.frames;
     this.height = data.height;
@@ -10,10 +10,12 @@ class AsciiPlayer {
     this.playing = false;
     this.timer = null;
 
-    // 默认进入拦截逻辑
-    this.isHookActive = true;
-
-    this._hookConsoleForMetro(); // 自动侦测 Metro 输出
+    // 是否进入拦截逻辑
+    this.isHookActive = options.hookConsole;
+    if (options.hookConsole) {
+      // 原自动侦测 Metro 输出 改为公共方案 如果走日志监听在里面判断tool的逻辑
+      this._hookConsole();
+    }
   }
 
   start() {
@@ -67,7 +69,8 @@ class AsciiPlayer {
     );
   }
 
-  _hookConsoleForMetro() {
+  // 日志拦截方案
+  _hookConsole() {
     const originalStdoutWrite = process.stdout.write.bind(process.stdout);
     const originalStderrWrite = process.stderr.write.bind(process.stderr);
 
@@ -83,16 +86,21 @@ class AsciiPlayer {
       const msg = chunk.toString();
       const strippedMsg = this._stripAnsi(msg);
 
-      if (strippedMsg.includes("Dev server ready") && !this.playing) {
-        this.suppressOutput = true;
-        this.start();
-      } else if (
-        strippedMsg.trim().startsWith("BUNDLE") &&
-        !strippedMsg.includes("%")
-      ) {
-        this.showSuccess();
-        this.suppressOutput = false;
+      if (this.tool === "metro") {
+        if (strippedMsg.includes("Dev server ready") && !this.playing) {
+          this.suppressOutput = true;
+          this.start();
+        } else if (
+          strippedMsg.trim().startsWith("BUNDLE") &&
+          !strippedMsg.includes("%")
+        ) {
+          this.showSuccess();
+          this.suppressOutput = false;
+        }
       }
+
+      // 如果rollup、webpack、vite等工具也要走日志监听的路子，可以在这里扩展
+      // 但目前rollup走生命周期钩子，，所以这里就不写了
 
       if (msg.includes("\u200B\u200B") || !this.suppressOutput) {
         originalStdoutWrite(

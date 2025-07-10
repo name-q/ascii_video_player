@@ -5,7 +5,7 @@ let globalPlayer = null;
 function withAsciiPlayer(config, videoPath = './ascii_video.json') {
   // Start player immediately
   if (!globalPlayer) {
-    globalPlayer = new AsciiPlayer(videoPath);
+    globalPlayer = new AsciiPlayer(videoPath, { tool: 'metro', hookConsole: true });
     // globalPlayer.start();
     
     // Listen for process exit to show success
