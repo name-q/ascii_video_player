@@ -32,7 +32,8 @@ class AsciiPlayer {
     if (!this.playing) return;
 
     process.stdout.write(`\x1b[${this.height}A`);
-    console.log(this.frames[this.currentFrame]);
+    // 加入零宽空格标记
+    console.log(this.frames[this.currentFrame] + "\u200B\u200B");
 
     this.currentFrame = (this.currentFrame + 1) % this.frames.length;
 
@@ -43,14 +44,14 @@ class AsciiPlayer {
     this.stop();
     process.stdout.write(`\x1b[${this.height}A`);
     console.clear();
-    console.log("🎉 Build Success! 🎉");
+    console.log("🎉 Build Success! 🎉\u200B\u200B\n");
   }
 
   showError(error) {
     this.stop();
     process.stdout.write(`\x1b[${this.height}A`);
     console.clear();
-    console.error("❌ Build Error:");
+    console.error("❌ Build Error:\n");
     console.error(error);
   }
 
@@ -68,26 +69,32 @@ class AsciiPlayer {
     this.suppressOutput = false;
 
     process.stdout.write = (chunk, encoding, callback) => {
-      const msg = this._stripAnsi(chunk.toString());
+      const msg = chunk.toString();
+      const strippedMsg = this._stripAnsi(msg);
 
-      if (msg.includes("Dev server ready") && !this.playing) {
+      if (strippedMsg.includes("Dev server ready") && !this.playing) {
         this.suppressOutput = true;
         this.start();
-      } else if (msg.trim().startsWith("BUNDLE") && !msg.includes("%")) {
+      } else if (
+        strippedMsg.trim().startsWith("BUNDLE") &&
+        !strippedMsg.includes("%")
+      ) {
         this.showSuccess();
         this.suppressOutput = false;
       }
 
-      if (!this.suppressOutput) {
-        originalStdoutWrite(chunk, encoding, callback);
+      // 检测零宽空格标记
+      if (msg.includes("\u200B\u200B") || !this.suppressOutput) {
+        originalStdoutWrite(chunk.replace("\u200B\u200B", ""), encoding, callback);
       }
     };
 
     process.stderr.write = (chunk, encoding, callback) => {
-      const msg = this._stripAnsi(chunk.toString());
+      const msg = chunk.toString();
+      const strippedMsg = this._stripAnsi(msg);
 
-      if (msg.toLowerCase().includes("error")) {
-        this.showError(msg);
+      if (strippedMsg.toLowerCase().includes("error")) {
+        this.showError(strippedMsg);
         this.suppressOutput = false;
       }
 
