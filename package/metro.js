@@ -10,7 +10,7 @@ function withAsciiPlayer(config, videoPath = './ascii_video.json') {
     
     // Listen for process exit to show success
     process.on('SIGINT', () => {
-      globalPlayer?.showSuccess();
+      globalPlayer?.showExit();
       process.exit(0);
     });
     

@@ -15,8 +15,24 @@ async function testPlayer() {
   setTimeout(() => {
     player.showSuccess();
     console.log('✅ Success test passed');
-    testError();
+    testExit();
   }, 3000);
+}
+
+function testExit() {
+  console.log('\n🧪 Testing exit handling...');
+  
+  const videoPath = path.join(__dirname, '../output/ascii_video.json');
+  const player = new AsciiPlayer(videoPath);
+  
+  player.start();
+  
+  // 2秒后显示退出
+  setTimeout(() => {
+    player.showExit();
+    console.log('✅ Exit test passed');
+    testError();
+  }, 2000);
 }
 
 function testError() {

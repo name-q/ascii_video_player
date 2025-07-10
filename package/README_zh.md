@@ -129,6 +129,9 @@ player.showSuccess();
 
 // 构建失败时
 player.showError(error);
+
+// 退出时
+player.showExit();
 ```
 
 ## 📁 项目结构

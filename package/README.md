@@ -135,6 +135,9 @@ player.showSuccess();
 
 // On build error
 player.showError(error);
+
+// On exit
+player.showExit();
 ```
 
 ## 📁 Project Structure

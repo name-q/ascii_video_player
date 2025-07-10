@@ -67,6 +67,14 @@ class AsciiPlayer {
     this.originalStderrWrite(error + "\n\n");
   }
 
+  // 主动退出
+  showExit() {
+    this.stop();
+    this.originalStdoutWrite(`\x1b[${this.height}A`);
+    console.clear();
+    this.originalStdoutWrite("\n\n\n❤️Baby bye👋  bye👋  bye👋\n\n\n");
+  }
+
   _stripAnsi(str) {
     return str.replace(
       /[][[\]()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
