@@ -62,28 +62,38 @@ class AsciiPlayer {
   }
 
   _hookConsoleForMetro() {
-    const originalLog = console.log;
-    const originalError = console.error;
+    const originalStdoutWrite = process.stdout.write.bind(process.stdout);
+    const originalStderrWrite = process.stderr.write.bind(process.stderr);
 
-    console.log = (...args) => {
-      const rawMsg = args.join(" ");
-      const msg = this._stripAnsi(rawMsg);
+    this.suppressOutput = false;
 
-      if (msg.includes("BUNDLE") && msg.includes("%") && !this.playing) {
+    process.stdout.write = (chunk, encoding, callback) => {
+      const msg = this._stripAnsi(chunk.toString());
+
+      if (msg.includes("Dev server ready") && !this.playing) {
+        this.suppressOutput = true;
         this.start();
       } else if (msg.trim().startsWith("BUNDLE") && !msg.includes("%")) {
         this.showSuccess();
+        this.suppressOutput = false;
       }
 
-      originalLog(...args);
+      if (!this.suppressOutput) {
+        originalStdoutWrite(chunk, encoding, callback);
+      }
     };
 
-    console.error = (...args) => {
-      const msg = this._stripAnsi(args.join(" "));
+    process.stderr.write = (chunk, encoding, callback) => {
+      const msg = this._stripAnsi(chunk.toString());
+
       if (msg.toLowerCase().includes("error")) {
         this.showError(msg);
+        this.suppressOutput = false;
       }
-      originalError(...args);
+
+      if (!this.suppressOutput) {
+        originalStderrWrite(chunk, encoding, callback);
+      }
     };
   }
 }
